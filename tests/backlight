@@ -1,0 +1,6 @@
+#!/bin/bash
+
+tests_failed=0
+[[ backlight ]] || ((tests_failed++))
+
+
