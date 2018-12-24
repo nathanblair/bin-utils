@@ -1,6 +1,14 @@
 #!/bin/bash
 
-tests_failed=0
-[[ backlight ]] || ((tests_failed++))
+echo Starting backlight tests...
+echo
 
+tests_failed=0
+echo Running 'backlight' - should show current backlight value...
+echo $(backlight)
+[[ $? -ne 0 ]] && ((tests_failed++))
+
+echo
+echo Tests failed: $tests_failed
+exit $tests_failed
 
