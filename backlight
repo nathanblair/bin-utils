@@ -25,7 +25,7 @@ corrected_brightness=${1/%\%/}
 
 raw_brightness=$corrected_brightness
 [[ $prefix == "+" || $prefix == "-" ]] &&
-	raw_brightness=$(echo $corrected_brightness'+'$current_brightness | bc -l)
+	raw_brightness=$(echo ${corrected_brightness/#+/}'+'$current_brightness | bc -l)
 
 [[ $(echo $raw_brightness'<=0' | bc -l) -eq 1 ]] && raw_brightness=1
 
