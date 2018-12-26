@@ -27,8 +27,8 @@ backlight n%
 - Sets the backlight to this percentage of the total brightness
 
 backlight +n%
-- Increments the backlight percentage by this amount
+- Increments the backlight percentage by this percentage amount
 
 backlight -n%
-- Decrements the backlight percentage by this amount
+- Decrements the backlight percentage by this percentage amount
 
