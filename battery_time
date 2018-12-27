@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Abandoned and not working - do not use; opt for acpi
+
+(( ($1 == 0) || ($1 == 1) )) && battery_instance=$1 || battery_instance=0
+
+energy_now=$(cat /sys/class/power_supply/BAT${battery_instance}/energy_now)
+power_now=$(cat /sys/class/power_supply/BAT${battery_instance}/power_now)
+(( power_now == 0 )) && exit
+
+time_remaining=$(echo $energy_now'/'$power_now | bc -l)
+
+# Format the time remaining
+hours_remaining=$(echo $time_remaining | cut -f1 -d".")
+
+hour_fraction_remaining=$(echo $time_remaining'-'$hours_remaining | bc -l)
+minutes_portion_remaining=$(echo $hour_fraction_remaining'*60' | bc -l)
+minutes_portion_remaining=$(printf '%.0f' $minutes_portion_remaining)
+
+remaining_time=$(printf '%.0f:%.0f' $hours_remaining $minutes_portion_remaining)
+
+echo $remaining_time
+
