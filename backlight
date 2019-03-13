@@ -1,38 +1,35 @@
 #!/bin/bash
 
-# Argument 1 should be the desired amount to change the brightness by
-#		(in percent)
-#		If querying for brightness values, would need to be +/-0
-# Argument 2 should be the name of the backlight device
-#
+backlight_path=/sys/class/backlight
+device_name=${2:-$(ls $backlight_path | head -1)}
+max_brightness=$(cat $backlight_path/$device_name/max_brightness 2>/dev/null)
 
-[[ ! -z $2 ]] && device_name=$2 || device_name=$(ls /sys/class/backlight)
+# Check that a maximum brightness could be obtained
+: ${max_brightness:?Could not get max brightness of device!}
 
-max_brightness=$(cat /sys/class/backlight/$device_name/max_brightness 2>/dev/null)
-if [ -z $max_brightness ]; then exit -1; fi
+current_brightness=$(cat $backlight_path/$device_name/brightness 2>/dev/null)
 
-current_brightness=$(cat /sys/class/backlight/$device_name/brightness 2>/dev/null)
-current_brightness_percent=$(printf '%.0f%%\n' $(echo "$current_brightness / $max_brightness * 100" | bc -l))
+# Print the raw number if no arguments given
+[[ -z $1 ]] && echo $current_brightness && exit 0
+# Print the current brightness in percent if argument given is a '%' sign
+[[ $1 == '%' ]] && printf '%.0f%%\n' \
+    $( echo "$current_brightness / $max_brightness * 100" | bc -l) \
+    && exit 0
 
-[[ -z $1 ]] && echo $current_brightness_percent && exit 0
+# Extract mods from string and apply them if applicable
+setting=$1
+[[ ${1: -1} == '%' ]] && setting=${1%\%} && \
+    setting=$( echo "${setting#+} / 100 * $max_brightness" | bc -l )
+[[ ${1:0:1} == '+' || ${1:0:1} == '-' ]] && \
+    setting=$( echo "${setting#+} + $current_brightness" | bc -l )
 
-prefix=${1:0:1}
-suffix=${1: -1}
+[[ $(echo "$setting <= 0" | bc -l) == 1 ]] && setting=1
+[[ $(echo "$setting > $max_brightness" | bc -l) == 1 ]] && setting=$max_brightness
 
-corrected_brightness=${1/%\%/}
+# Set the brightness
+echo $(printf '%.0f' $setting) \
+    > /sys/class/backlight/$device_name/brightness
 
-[[ $suffix = '%' ]] && corrected_brightness=$(echo "${corrected_brightness/#+/} / 100 * $max_brightness" | bc -l)
-
-raw_brightness=$corrected_brightness
-[[ $prefix == "+" || $prefix == "-" ]] &&
-	raw_brightness=$(echo ${corrected_brightness/#+/}'+'$current_brightness | bc -l)
-
-[[ $(echo $raw_brightness'<=0' | bc -l) -eq 1 ]] && raw_brightness=1
-
-[[ $(echo $raw_brightness'>='$max_brightness | bc -l) -eq 1 ]] &&
-	raw_brightness=$max_brightness
-
-raw_brightness=$(printf '%.0f' $raw_brightness)
-echo "$raw_brightness" > /sys/class/backlight/$device_name/brightness
+# Exit with whether setting the brightness was successful
 exit $?
 
