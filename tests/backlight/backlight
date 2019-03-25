@@ -3,7 +3,9 @@
 device=$(ls /sys/class/backlight)
 function RunTest {
     before_brightness=$(cat /sys/class/backlight/$device/brightness)
+    echo $before_brightness
     backlight $1
+    echo $after_brightness
     after_brightness=$(cat /sys/class/backlight/$device/brightness)
 
     [[ ${1:0:1} == '+' || ${1:0:1} == '-' ]] && operator=${1:0:1} \

@@ -23,7 +23,7 @@ setting=$1
 [[ ${1:0:1} == '+' || ${1:0:1} == '-' ]] && \
     setting=$( echo "${setting#+} + $current_brightness" | bc -l )
 
-[[ $(echo "$setting <= 0" | bc -l) == 1 ]] && setting=1
+[[ $(echo "$setting <= 1" | bc -l) == 1 ]] && setting=1
 [[ $(echo "$setting > $max_brightness" | bc -l) == 1 ]] && setting=$max_brightness
 
 # Set the brightness
