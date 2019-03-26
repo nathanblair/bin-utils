@@ -1,64 +1,68 @@
 #!/bin/bash
 
 device=$(ls /sys/class/backlight)
-function RunTest {
-    before_brightness=$(cat /sys/class/backlight/$device/brightness)
-    echo $before_brightness
-    backlight $1
-    echo $after_brightness
-    after_brightness=$(cat /sys/class/backlight/$device/brightness)
+backlight_path=/sys/class/backlight
 
-    [[ ${1:0:1} == '+' || ${1:0:1} == '-' ]] && operator=${1:0:1} \
-                                               || operator='='
+function GetCurrentBrightness {
+    echo $(cat $backlight_path/$device/brightness 2>/dev/null)
+}
 
-    setting=${1%\%}
-    check_brightness=$(( before_brightness $operator $setting ))
-    [[ $after_brightness -ne $check_brightness ]] && return 1 || return 0
+function GetAbsoluteFromPercent {
+    max=$(cat $backlight_path/$device/max_brightness 2>/dev/null)
+    relative=$(printf "%.0f" $( echo "$max * $1 / 100" | bc -l ))
+    echo $relative
 }
 
 tests_failed=0
 sleep_time=5s
 
-echo Running ''backlight''
-[[ $(RunTest) -ne 0 ]] && ((tests_failed++))
+echo Running \"backlight\"
+backlight > /dev/null
+ex=$?
+(( ex == 0 )) || ((tests_failed++))
 
-echo Running ''backlight %''
-[[ $(RunTest %) -ne 0 ]] && ((tests_failed++))
+echo Running \"backlight %\"
+backlight % > /dev/null
+ex=$?
+(( ex == 0 )) || ((tests_failed++))
 
-#echo Running ''backlight 200''
-#[[ $(RunTest 200) -ne 0 ]] && ((tests_failed++))
+echo Running \"backlight 200\"
+backlight 200 > /dev/null
+ex=$?
+(( $(GetCurrentBrightness) == 200 && ex == 0 )) || ((tests_failed++))
 
-#echo Running ''backlight +50''
-#[[ $(RunTest +50) -ne 0 ]] && ((tests_failed++))
+echo Running \"backlight +2\"
+current=$(GetCurrentBrightness)
+backlight +2 > /dev/null
+ex=$?
+(( $(GetCurrentBrightness) == current + 2 && ex == 0 )) || ((tests_failed++))
 
-# echo Running 'backlight' - should show current backlight value...
-# echo $(backlight)
-# [[ $? -ne 0 ]] && ((tests_failed++))
-# sleep $sleep_time
-# 
-# n=50%
-# echo Running ''backlight $n'' - should set backlight to $n
-# echo $(backlight $n)
-# # Replace with an assert
-# [[ $? -ne 0 ]] && ((tests_failed++))
-# echo $(backlight)
-# sleep $sleep_time
-# 
-# n=+50%
-# echo Running ''backlight $n'' - should increment backlight by $n
-# echo $(backlight $n)
-# # Replace with an assert
-# [[ $? -ne 0 ]] && ((tests_failed++))
-# echo $(backlight)
-# sleep $sleep_time
-# 
-# n=-50%
-# echo Running ''backlight $n'' - should decrement backlight by $n
-# echo $(backlight $n)
-# # Replace with an assert
-# [[ $? -ne 0 ]] && ((tests_failed++))
-# echo $(backlight)
-# sleep $sleep_time
+echo Running \"backlight -2\"
+current=$(GetCurrentBrightness)
+backlight -2 > /dev/null
+ex=$?
+(( $(GetCurrentBrightness) == current - 2 && ex == 0 )) || ((tests_failed++))
+
+echo Running \"backlight 50%\"
+current=$(GetCurrentBrightness)
+backlight 50% > /dev/null
+ex=$?
+check=$(printf "%.0f" $(GetAbsoluteFromPercent 50))
+(( $(GetCurrentBrightness) == check && ex == 0 )) || ((tests_failed++))
+
+echo Running \"backlight +5%\"
+current=$(GetCurrentBrightness)
+backlight +5% > /dev/null
+ex=$?
+check=$(( $(GetAbsoluteFromPercent 50) + $(GetAbsoluteFromPercent 5) ))
+(( $(GetCurrentBrightness) == check && ex == 0 )) || ((tests_failed++))
+
+echo Running \"backlight -5%\"
+current=$(GetCurrentBrightness)
+backlight -5% > /dev/null
+ex=$?
+check=$(GetAbsoluteFromPercent 50)
+(( $(GetCurrentBrightness) == check && ex == 0 )) || ((tests_failed++))
 
 echo
 echo Tests failed: $tests_failed
