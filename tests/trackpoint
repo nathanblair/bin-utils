@@ -33,17 +33,17 @@ setting=$(trackpoint p)
 
 echo
 echo Running \"trackpoint s 150\"
-current=$(GetSpeed)
+current=$(GetSensitivity)
 trackpoint s 150
 ex=$?
-(( ex == 0 && current == 10 )) || ((tests_failed++))
+(( ex == 0 && current == 150 )) || ((tests_failed++))
 
 echo
 echo Running \"trackpoint p 50\"
 current=$(GetSpeed)
 trackpoint p 50
 ex=$?
-(( ex == 0 && current == 10 )) || ((tests_failed++))
+(( ex == 0 && current == 50 )) || ((tests_failed++))
 
 echo
 echo Tests failed: $tests_failed
