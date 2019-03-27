@@ -1,0 +1,51 @@
+#!/bin/bash
+
+function GetSpeed {
+    echo $(cat /sys/devices/platform/i8042/serio1/serio2/speed)
+}
+
+function GetSensitivity {
+    echo $(cat /sys/devices/platform/i8042/serio1/serio2/sensitivity)
+}
+
+tests_failed=0
+
+echo Running \"trackpoint\"
+trackpoint
+ex=$?
+(( ex == 0 )) || ((tests_failed++))
+
+echo
+echo Running \"trackpoint s\"
+current=$(GetSensitivity)
+trackpoint s
+ex=$?
+setting=$(trackpoint s)
+(( ex == 0 && setting == current )) || ((tests_failed++))
+
+echo
+echo Running \"trackpoint p\"
+current=$(GetSpeed)
+trackpoint p
+ex=$?
+setting=$(trackpoint p)
+(( ex == 0 && setting == current )) || ((tests_failed++))
+
+echo
+echo Running \"trackpoint s 150\"
+current=$(GetSpeed)
+trackpoint s 150
+ex=$?
+(( ex == 0 && current == 10 )) || ((tests_failed++))
+
+echo
+echo Running \"trackpoint p 50\"
+current=$(GetSpeed)
+trackpoint p 50
+ex=$?
+(( ex == 0 && current == 10 )) || ((tests_failed++))
+
+echo
+echo Tests failed: $tests_failed
+exit $tests_failed
+

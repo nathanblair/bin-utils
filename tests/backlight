@@ -14,7 +14,6 @@ function GetAbsoluteFromPercent {
 }
 
 tests_failed=0
-sleep_time=5s
 
 echo Running \"backlight\"
 backlight > /dev/null
