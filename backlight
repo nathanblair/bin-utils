@@ -9,12 +9,10 @@ max_brightness=$(cat $backlight_path/$device_name/max_brightness 2>/dev/null)
 
 current_brightness=$(cat $backlight_path/$device_name/brightness 2>/dev/null)
 
+percentage_brightness=$( echo "$current_brightness / $max_brightness * 100" | bc -l) \
+
 # Print the raw number if no arguments given
-[[ -z $1 ]] && echo $current_brightness && exit 0
-# Print the current brightness in percent if argument given is a '%' sign
-[[ $1 == '%' ]] && printf '%.0f%%\n' \
-    $( echo "$current_brightness / $max_brightness * 100" | bc -l) \
-    && exit 0
+[[ -z $1 ]] && printf '{"text":"%s","tooltip":"%.0f%%","class":"","percentage":%.0f}\n' $current_brightness $percentage_brightness $percentage_brightness && exit 0
 
 # Extract mods from string and apply them if applicable
 setting=$1
