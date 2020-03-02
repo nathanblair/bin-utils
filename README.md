@@ -2,6 +2,9 @@
 A collection of shell scripts as utilities
 
 Move/Copy the .rules files into your udev rules directory
+
+__NOTE__ Symlinking does *NOT* work!
+
 `sudo cp udev_rules/*.rules /etc/udev/rules.d/`
 
 Use `sudo mv` or `sudo ln -s` to move utility files to a place on the path 
