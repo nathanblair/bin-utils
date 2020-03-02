@@ -16,18 +16,19 @@ percentage_brightness=$( echo "$current_brightness / $max_brightness * 100" | bc
 
 # Extract mods from string and apply them if applicable
 setting=$1
-[[ ${1: -1} == '%' ]] && setting=${1%\%} && \
-    setting=$( echo "${setting#+} / 100 * $max_brightness" | bc -l )
-[[ ${1:0:1} == '+' || ${1:0:1} == '-' ]] && \
-    setting=$( echo "${setting#+} + $current_brightness" | bc -l )
+[[ ${1: -1} == '%' ]] && setting=${1%\%} && setting=$( echo "${setting#+} / 100 * $max_brightness" | bc -l )
+[[ ${1:0:1} == '+' || ${1:0:1} == '-' ]] && setting=$( echo "${setting#+} + $current_brightness" | bc -l )
 
 [[ $(echo "$setting <= 1" | bc -l) == 1 ]] && setting=1
 [[ $(echo "$setting > $max_brightness" | bc -l) == 1 ]] && setting=$max_brightness
 
 # Set the brightness
-echo $(printf '%.0f' $setting) \
-    > /sys/class/backlight/$device_name/brightness
+brightness_file_path="/sys/class/backlight/$device_name/brightness"
+value=$(printf '%.0f' $setting)
+echo Setting brightness to: $value
+echo Using backlight kernel display: $brightness_file_path
+[[ -f $brightness_file_path ]] || echo Could not locate brightness file at: $brightness_file_path
+echo $value > $brightness_file_path
 
 # Exit with whether setting the brightness was successful
 exit $?
-
