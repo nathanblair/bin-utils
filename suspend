@@ -1,0 +1,56 @@
+#!/bin/bash
+
+suspend_to_mem() {
+  echo 'Suspending to RAM...' >&2
+  # Suspend to mem enumerations
+  s2idle='s2idle'
+}
+
+suspend_to_disk() {
+  echo 'Suspending to Disk (hibernating)...' >&2
+  echo Not Implemented! >&2
+  return 1
+}
+
+suspend_to_idle() {
+  echo 'Suspending to Idle...' >&2
+  echo Not Implemented! >&2
+  return 1
+}
+
+poweron_standby() {
+  echo 'Power-On Suspend...' >&2
+  echo Not Implemented! >&2
+  return 1
+}
+
+showUsage() {
+  echo Potential states: [$potential_states]
+}
+
+potential_states=$(cat /sys/power/state)
+case $1 in
+  '--help'|'-help'|'-h'|'help'|'h')
+    showUsage
+    exit 0
+esac
+
+[[ ! -z $1 ]] && suspend_state=$1 || suspend_state='mem'
+echo Suspend state: $suspend_state
+
+[[ ! -z "${potential_states##*$suspend_state*}" ]] && echo $suspend_state not in [$potential_states] && exit 1
+
+case $suspend_state in
+  'mem')
+    suspend_to_mem
+    ;;
+  'disk')
+    suspend_to_disk
+    ;;
+  'freeze')
+    suspend_to_idle
+    ;;
+  'standby')
+    poweron_standby
+    ;;
+esac
