@@ -1,25 +1,39 @@
 #!/bin/bash
 
+state_path='/sys/power/state'
+mem_sleep_path='/sys/power/mem_sleep'
+
 suspend_to_mem() {
   echo 'Suspending to RAM...' >&2
-  # Suspend to mem enumerations
-  s2idle='s2idle'
-}
 
-suspend_to_disk() {
-  echo 'Suspending to Disk (hibernating)...' >&2
-  echo Not Implemented! >&2
-  return 1
+  echo 's2idle [deep]' > $mem_sleep_path
+  #echo 'mem' > $state_path
+  echo 'Waking from RAM...' >&2
 }
 
 suspend_to_idle() {
   echo 'Suspending to Idle...' >&2
+
+  state='freeze'
+
   echo Not Implemented! >&2
   return 1
 }
 
 poweron_standby() {
   echo 'Power-On Suspend...' >&2
+
+  state='standby'
+
+  echo Not Implemented! >&2
+  return 1
+}
+
+suspend_to_disk() {
+  echo 'Suspending to Disk (hibernating)...' >&2
+
+  state='disk'
+
   echo Not Implemented! >&2
   return 1
 }
@@ -33,10 +47,10 @@ case $1 in
   '--help'|'-help'|'-h'|'help'|'h')
     showUsage
     exit 0
+    ;;
 esac
 
 [[ ! -z $1 ]] && suspend_state=$1 || suspend_state='mem'
-echo Suspend state: $suspend_state
 
 [[ ! -z "${potential_states##*$suspend_state*}" ]] && echo $suspend_state not in [$potential_states] && exit 1
 
