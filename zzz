@@ -39,6 +39,7 @@ suspend_to_disk() {
 
 showUsage() {
   echo Potential states: [$potential_states]
+  echo "Default is 'mem'"
 }
 
 potential_states=$(cat /sys/power/state)
