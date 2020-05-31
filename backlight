@@ -30,5 +30,4 @@ echo Using backlight kernel display: $brightness_file_path
 [[ -f $brightness_file_path ]] || echo Could not locate brightness file at: $brightness_file_path
 echo $value > $brightness_file_path
 
-# Exit with whether setting the brightness was successful
 exit $?
