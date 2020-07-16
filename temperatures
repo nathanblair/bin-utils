@@ -1,0 +1,8 @@
+#!/bin/env sh
+
+zone_number=0
+for eachTempReport in $(cat /sys/class/thermal/thermal_zone*/temp); do
+  temp=$((${eachTempReport} / 1000))
+  echo "Thermal zone ${zone_number}: ${temp} °C"
+  zone_number=$((zone_number + 1))
+done
