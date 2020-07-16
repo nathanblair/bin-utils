@@ -1,4 +1,4 @@
-#!/bin/env sh
+#!/usr/bin/env sh
 
 zone_number=0
 for eachTempReport in $(cat /sys/class/thermal/thermal_zone*/temp); do

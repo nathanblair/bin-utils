@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 state_path='/sys/power/state'
 mem_sleep_path='/sys/power/mem_sleep'

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 trackpoint_path=/sys/devices/platform/i8042/
 device_name=${2:-$(ls $trackpoint_path/$serio1 | head -1)}

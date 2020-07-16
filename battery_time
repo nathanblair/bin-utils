@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 # Abandoned and not working - do not use; opt for acpi
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 backlight_path=/sys/class/backlight
 device_name=${2:-$(ls $backlight_path | head -1)}
