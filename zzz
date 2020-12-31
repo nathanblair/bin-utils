@@ -1,44 +1,46 @@
 #!/usr/bin/env sh
 
-state_path='/sys/power/state'
+state='/sys/power/state'
 mem_sleep_path='/sys/power/mem_sleep'
 
 suspend_to_mem() {
-  echo 'Suspending to RAM...' >&2
-  su -c "echo 'deep' > '$mem_sleep_path'" || return -1
-  su -c "echo 'mem' > '$state_path'" || return -1
-  echo 'Waking from RAM...' >&2
+  echo "Suspending to RAM..." >&2
+  echo "Writing 'deep' to: ${mem_sleep_path}" >&2
+  echo "deep" > "${mem_sleep_path}" || return -1
+  echo "Writing "mem" to: ${state_path}" >&2
+  echo "mem" > "${state_path}" || return -1
+  echo "Waking from RAM..." >&2
 }
 
 suspend_to_idle() {
-  echo 'Suspending to Idle...' >&2
+  echo "Suspending to Idle..." >&2
 
-  state='freeze'
+  state="freeze"
 
-  echo Not Implemented! >&2
+  echo "Not Implemented!" >&2
   return 1
 }
 
 poweron_standby() {
-  echo 'Power-On Suspend...' >&2
+  echo "Power-On Suspend..." >&2
 
-  state='standby'
+  state="standby"
 
-  echo Not Implemented! >&2
+  echo "Not Implemented!" >&2
   return 1
 }
 
 suspend_to_disk() {
-  echo 'Suspending to Disk (hibernating)...' >&2
+  echo "Suspending to Disk (hibernating)..." >&2
 
-  state='disk'
+  state="disk"
 
-  echo Not Implemented! >&2
+  echo "Not Implemented!" >&2
   return 1
 }
 
 showUsage() {
-  echo Potential states: [$potential_states]
+  echo "Potential states: [${potential_states}]"
   echo "Default is 'mem'"
 }
 
@@ -46,13 +48,19 @@ potential_states=$(cat /sys/power/state)
 case $1 in
   '--help'|'-help'|'-h'|'help'|'h')
     showUsage
-    exit 0
-    ;;
+    exit 0;;
 esac
 
-[[ ! -z $1 ]] && suspend_state=$1 || suspend_state='mem'
+if [ ! -z $1 ]; then
+  suspend_state=$1
+else
+  suspend_state='mem'
+fi
 
-[[ ! -z "${potential_states##*$suspend_state*}" ]] && echo $suspend_state not in [$potential_states] && exit 1
+if [ ! -z "${potential_states##*$suspend_state*}" ]; then
+  echo "${suspend_state} not in [${potential_states}]"
+  exit 1
+fi
 
 case $suspend_state in
   'mem')
@@ -68,3 +76,4 @@ case $suspend_state in
     poweron_standby
     ;;
 esac
+
