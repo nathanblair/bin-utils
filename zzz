@@ -1,11 +1,11 @@
 #!/usr/bin/env sh
 
-state_path='/sys/power/state'
-mem_sleep_path='/sys/power/mem_sleep'
+state_path="/sys/power/state"
+mem_sleep_path="/sys/power/mem_sleep"
 
 potential_states=$(cat "${state_path}")
 # It would be better to default this to valid value retrieved from $potential_states
-suspend_state='mem'
+suspend_state="mem"
 
 suspend_to_mem() {
   echo "Suspending to RAM..." >&2
