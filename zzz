@@ -6,9 +6,9 @@ mem_sleep_path='/sys/power/mem_sleep'
 suspend_to_mem() {
   echo "Suspending to RAM..." >&2
   echo "Writing 'deep' to: ${mem_sleep_path}" >&2
-  echo "deep" > "${mem_sleep_path}" || return -1
+  echo "deep" > "${mem_sleep_path}" || return 2
   echo "Writing "mem" to: ${state_path}" >&2
-  echo "mem" > "${state_path}" || return -1
+  echo "mem" > "${state_path}" || return 2
   echo "Waking from RAM..." >&2
 }
 

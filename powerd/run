@@ -1,0 +1,7 @@
+chown root:power /sys/power/state
+chown root:power /sys/power/mem_sleep
+
+chmod 664 /sys/power/state
+chmod 664 /sys/power/mem_sleep
+
+# vim:ft=SH
