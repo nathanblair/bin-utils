@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-state='/sys/power/state'
+state_path='/sys/power/state'
 mem_sleep_path='/sys/power/mem_sleep'
 
 suspend_to_mem() {
