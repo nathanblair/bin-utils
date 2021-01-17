@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+ln -s /mnt/wsl/docker-desktop/shared-sockets/guest-services/docker.sock /var/run/docker.sock
+
+chown root:docker /var/run/docker.sock
+
