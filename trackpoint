@@ -1,12 +1,19 @@
 #!/usr/bin/env sh
 
-trackpoint_path=/sys/devices/platform/i8042/
-device_name=${2:-$(ls $trackpoint_path/$serio1 | head -1)}
+root_path="/sys/devices/platform/i8042"
+path1="${root_path}/serio1"
+path2="${root_path}/serio1/serio2"
 
-[[ -z $1 ]] && \
-    echo Sensitivity: $(cat /sys/devices/platform/i8042/serio1/serio2/sensitivity) && \
-    echo Speed: $(cat /sys/devices/platform/i8042/serio1/serio2/speed) && \
-exit 0
+trackpoint_path=$path1
+
+if [ -e $path2 ]; then trackpoint_path=$path2; fi
+
+if [ -z $1 ]; then
+    echo Sensitivity: $(cat "${trackpoint_path}/sensitivity")
+    speed_path="${trackpoint_path}/speed"
+    if [ -e $speed_path ]; then echo Speed: $(cat "${speed_path}"); fi
+    exit 0
+fi
 
 case $1 in
     "s")
@@ -16,13 +23,17 @@ case $1 in
         t="speed"
         ;;
     *)
-        echo "Invalid argument!" && exit -1
+        echo "Invalid argument!"
+        exit -1
         ;;
 esac
 
-[[ -z $2 ]] && echo $(cat $trackpoint_path/serio1/serio2/$t) && exit 0
+if [ -z $2 ]; then
+    echo $(cat "${trackpoint_path}/${t}")
+    exit 0
+fi
 
 setting=$2
-echo -n $setting > $trackpoint_path/serio1/serio2/$t
+echo -n $setting > "${trackpoint_path}/${t}"
 exit $?
 
